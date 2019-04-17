@@ -1,5 +1,7 @@
 # NoSQL Databases
 
+`WARNING: these notes might or might not contain Game of Thrones spoilers`
+
 ## Relational Databases (SQL)
 In **relational databases** data is structured in _tuples_ (rows), _relations_ (tables), and _schemas_ (fixed table, columns and type structures). Primary keys identify rows within a table, while foreign keys allow to refer rows between tables.
 
@@ -42,17 +44,119 @@ The first four data models (Key-Value, Document, Column) have an **aggregate** o
 Example JSON object:
 ```json
 {
-  "name":"John",
-  "age":30,
-  "cars": {
-    "car1":"Ford",
-    "car2":"BMW",
-    "car3":"Fiat"
-  }
+  "name":"Daenerys",
+  "dragons": 
+  [
+    {"name": "Drogon"},
+    {"name": "Rhaegal"},
+    {"name": "Viserion", "wight": true}
+  ],
+  "fucksGiven": 0
  }
 ```
 
 ## MongoDB
+MongoDB is a cross-platform **document-oriented** database program. Classified as a NoSQL database program, MongoDB uses JSON-like documents with schemata. MongoDB is developed by MongoDB Inc. and licensed under the Server Side Public License.
+
+Each record in a MongoDB is a **document** an object similar to JSON, organised in a field-and-value structure. Values can be literals, arrays, and other documents. Internally, data documents are stored as **BSON**, which stands for binary JSON, and offers a few additional data types and references to other documents.
+
+All records in a MongoDB database need to have an `_id` field. If not explicitly specified at creation time, it will be created automatically. The autmatically created ids contain the UNIX timestamp in the first 4 bytes.
+
+Similar documents are stored in **collections**, which are comparable to relational database's tables. In turn, collections are stored in **databases**.
+
+The **mongo shell** is an interactive JavaScript interface to MongoDB. You can use the mongo shell to query and update data as well as perform administrative operations.
+
+### Query Language
+MongoDB has a JavaScript-based query language, that allows **CRUD** (create, read, update delete) operations.
+
+#### Create operations
+Databases are created automatically when the first record is inserted. 
+
+Selecting to select a database called `myDB` (even if it's non existent):
+
+```javascript
+use myDB
+```
+
+Then it is possible to insert the data ``{"name": "Daenerys", "dragons": 3}`` in the collection `characters` using:
+
+```javascript
+db.characters.insertOne({name: "Daenerys", dragons: 3})
+```
+
+This will create the document, the the collection and the database. It is also possible to use `insertMany`, by providing an array of documents, to insert more than one record at a time.
+
+To explicitly create a collection named `kingdoms` use:
+
+```javascript
+db.createCollection("kingdoms")
+```
+
+This allows to specify various options and constraints to the collection, using an optional parameter.
+
+#### Read operations
+It is possible to query the database according to certain criteria using the `db.<collection>.find()` method.
+
+To find all the records in a collection called `characters`:
+
+```javascript
+db.characters.find({})
+```
+
+To find all the records with the attribute `alive` set to `true`:
+
+```javascript
+db.characters.find({alive: true})
+```
+
+To find all the records that have the attribute `from` set either to `Winterfell` or `King's Landing`:
+
+```javascript
+db.characters.find({
+    from: {
+        $in: ["Winterfell", "King's Landing"]
+    }
+})
+```
+
+Filters can be combined. To combine the two above:
+
+```javascript
+db.characters.find({
+    from: {
+        $in: ["Winterfell", "King's Landing"]
+    },
+    alive: true
+})
+```
+
+#### Update Operations
+
+Using the queries it is possible to update existing documents. This is somewhat similar to a search operation, as the records need to be selected first.
+
+There are three methods to update records: `updateOne`, `updateMany`, and `replaceOne`.
+
+To update all the records with `fromHouse` set to `Lannister`, so that they their `status` attribute is sent to `paid`:
+
+```json
+db.debts.updateMany(
+	{fromHouse: "Lannister"},
+    {$set: {status: "paid"}}
+)
+```
+
+#### Delete Operations
+
+Two methods allow the removal of documents: `deleteMany` and `deleteOne`.
+
+To remove all documents with the `status` set to `paid` from the `debt` collection:
+
+```json
+db.debt.deleteMany(
+	{status: "paid"}
+)
+```
+
 ### Distribution Model
 ### Aggregation Pipeline
 ### Consistency
