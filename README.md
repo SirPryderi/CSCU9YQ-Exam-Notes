@@ -158,6 +158,23 @@ db.debt.deleteMany(
 ```
 
 ### Distribution Model
+MongoDB uses both **replication** and **sharding** to improve performances and data reliability.
+
+#### Replication
+In databases **replication** allows to have the same data available across multiple servers. This guarantees redundancy (**fault tolerance**) (in case of the loss of one of the servers) and better performances (**load balance**) (load balanced between the instances). This requires some sort synchronisation between the servers, which can happen either synchronously or asynchronously.
+
+In **synchronous replication** all replicas are updated when a write operation occurs. This guarantee that all replicas are consistent (**strict consistency**), guaranteeing more resilience, but this affects performance if there are too many writes operations.
+
+In **asynchronous replication** writes propagate as soon as possible, but there's no guarantee that the reads are going to be up to date (**eventual consistency**). This is normally fine because the propagation time is very quick, and usually marginally non-updated records are not a problem. Replicas might have a **master-slave** (only master is written, changes propagate to read-only replicas) configuration or **peer-to-peer** (each node is read/write and changes propagate to the others).
+
+#### Sharding
+Differently from replication, sharding spread the data among different nodes in a cluster. This means that only a subset of the data is available to each node.
+
+#### Replication and Sharding in MongoDB
+MongoDB is sharded on a collection level. Keys are used to quickly retrieve the document from the right shard. 
+
+Each shard has its own replication model. MongoDB uses master-slave asynchronous replication. The primary replica is guaranteed to up always up to date, while the read-only replicas receive the propagated updates from the master. This means that replicas are not immediately up to date (eventual consistency).
+
 ### Aggregation Pipeline
 ### Consistency
 ### Map Reduce
