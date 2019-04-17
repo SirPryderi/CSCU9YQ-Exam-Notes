@@ -140,7 +140,7 @@ To update all the records with `fromHouse` set to `Lannister`, so that they thei
 
 ```javascript
 db.debts.updateMany(
-	{fromHouse: "Lannister"},
+    {fromHouse: "Lannister"},
     {$set: {status: "paid"}}
 )
 ```
@@ -196,7 +196,7 @@ Data aggregation can be achieved in three ways in MongoDB:
  
  ```javascript
 db.<collection>.aggregate ([
-	{<stage1>},
+    {<stage1>},
     {<stage2>},
     ...
     {<stageN>},
@@ -217,13 +217,13 @@ Given the following dataset:
 
 ```json
 {
-	"name": "Jon Snow",
+    "name": "Jon Snow",
     "house": "Stark",
     "from": "Winterfell",
     "walkersKilled": 32
 }
 {
-	"name": "Benjen Stark",
+    "name": "Benjen Stark",
     "house": "Stark",
     "from": "Winterfell",
     "walkersKilled": 89
@@ -254,12 +254,12 @@ And would result in:
 
 ```json
 {
-	"name": "Jon Snow",
+    "name": "Jon Snow",
     "from": "Winterfell",
     "walkersKilled": 32
 }
 {
-	"name": "Benjen Stark",
+    "name": "Benjen Stark",
     "from": "Winterfell",
     "walkersKilled": 89
 }
@@ -409,7 +409,7 @@ Resulting in:
 
 ```json
 [
-    "Stark",
+	"Stark",
 	"Mormont",
 	"Tarly
 ]
