@@ -416,6 +416,23 @@ Resulting in:
 ```
 
 ### Consistency
+As we discussed earlier, MongoDB has a primary-secondary replication structure (guaranteeing fault-tolerance). Writes operations are only made on the primary node, and are propagated to the secondary over time. If the primary node fails, a new primary node is elected, but what if there was a non-replicated changes when the primary node failed and now it is brought back online? There will be conflicting changes that will require to be resolved.
+
+**Read consistency** – two readers see the same data at the same time after an update.
+**Write consistency** – only one writer is allowed to write at a time.
+
+In MongoDB each document is treated atomically, so only one **transaction** at a time can happen, then only providing consistency within one replica.
+
+NoSQL databases usually do not give **ACID** constraints, and it strongly depends on the application. For most of the purposes, **strong consistency** is not needed. Most of of the NoSQL stores rely on **eventual consistency**.
+
+In MongoDB it is possible, at query time, to choose the level of needed consistency, i.e. whether it is okay to retrieve slightly stale data, in favour of better performances.
+
+A distributed database can have only have two of the following:
+
+- **Strong consistency** – all nodes see the same data at the same time
+- **Availability** – every client gets a response, regardless if one of the nodes is down
+- **Partition tolerance** – the system continues to run regardless of the of number of delayed messages.
+
 ### Indexes
 ### Data Models
 ### Cursor and Projections
