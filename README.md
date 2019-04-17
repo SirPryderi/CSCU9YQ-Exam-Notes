@@ -175,9 +175,247 @@ MongoDB is sharded on a collection level. Keys are used to quickly retrieve the 
 
 Each shard has its own replication model. MongoDB uses master-slave asynchronous replication. The primary replica is guaranteed to up always up to date, while the read-only replicas receive the propagated updates from the master. This means that replicas are not immediately up to date (eventual consistency).
 
-### Aggregation Pipeline
+
+### Data Aggregation
+**Data aggregation** is the process of gathering and displaying information in form of a summary, usually for statistical purposes. Aggregation functions are often used such as: average, maximum, minimum, sum, etc.
+
+Data aggregation can be achieved in three ways in MongoDB:
+- Aggregation Pipeline 
+    - Uses native code
+- Map-reduce function
+    - Use custom JavaScript functions
+    - Harder to program
+    - Slower
+- Single purpose aggregation methods
+    - Limited
+ 
+ #### Aggregation Pipeline
+ The **aggregation** pipeline is a multi-stage process that transforms the document into an aggregated result. It provides filters, transformations, grouping and arrays manipulation.
+ 
+ The syntax for the aggregation pipeline is the following:
+ 
+ ```javascript
+db.<collection>.aggregate ([
+	{<stage1>},
+    {<stage2>},
+    ...
+    {<stageN>},
+])
+```
+
+Common stages are:
+- **$match** – Filters the collection according to the query.
+- **$group** – Groups the documents according to an expression.
+- **$project** – Reshapes the structure of the collection, adding and removing fields.
+- **$sort** – Reorders the documents according to some criterion.
+- **$unwind** – Deconstructs an array so that it generates a new document for each element.
+
+##### Match
+The `$match` stage filters the document stream according to a certain criterion, similar to `db.<collection>.find()`. This can be used to reduce the size of the initial stream, so it is a good idea to use it first.
+
+Given the following dataset:
+
+```json
+{
+	"name": "Jon Snow",
+    "house": "Stark",
+    "from": "Winterfell",
+    "walkersKilled": 32
+}
+{
+	"name": "Benjen Stark",
+    "house": "Stark",
+    "from": "Winterfell",
+    "walkersKilled": 89
+}
+{
+    "name": "Jeor Mormont",
+    "house": "Mormont",
+    "from": "Bear Island",
+    "walkersKilled": 15
+}
+{
+    "name": "Samwell Tarly",
+    "house": "Tarly",
+    "from": "Horn Hill",
+    "walkersKilled": 1
+}
+```
+
+In order to fetch all the records that have `from` set to `Winterfell`:
+
+```javascript
+db.nightwatch.aggregate([
+    {$match: {from: "Winterfell"}}
+])
+```
+
+And would result in:
+
+```json
+{
+	"name": "Jon Snow",
+    "from": "Winterfell",
+    "walkersKilled": 32
+}
+{
+	"name": "Benjen Stark",
+    "from": "Winterfell",
+    "walkersKilled": 89
+}
+```
+
+##### Group
+The `$group` stage allows to group multiple documents according to some criterion. This is useful to evaluate averages, sums, max, etc. as aggregation fields.
+
+For instance, in reference to the previous dataset, if you wanted to find the white walkers killed by each house:
+
+```javascript
+db.nightwatch.aggregate([
+    {$group: {_id: "$house", kills: {$sum: "$walkersKilled"}}}
+])
+```
+
+And would output:
+
+```json
+{
+    "_id": "Stark",
+    "kills": 121
+}
+{
+    "_id": "Mormont",
+    "kills": 15
+}
+{
+    "_id": "Tarly",
+    "kills": 1
+}
+```
+
+Similar methods could be used to extract other statistics.
+
+##### Project
+Project allows to reshape each document in the collection. It is possible to compute new fields, hide and create new ones.
+
+For instance, if you wanted to reshape the results of the previous query so that the `_id` field would me named `house`, you would do so: 
+
+```javascript
+db.nightwatch.aggregate([
+    {$group: {_id: "$house", kills: {$sum: "$walkersKilled"}}},
+    {$project: {_id: 0, house: "$_id", kills: 1}}
+])
+```
+
+Resulting in:
+
+```json
+{
+    "house": "Stark",
+    "kills": 121
+}
+{
+    "house": "Mormont",
+    "kills": 15
+}
+{
+    "house": "Tarly",
+    "kills": 1
+}
+```
+
+Note how setting a field to `0` will hide it, while `1` would reveal it.
+
+##### Unwind
+The `$unwind` operator allows to deconstruct an array field merging it with the parent document, creating a new document for each element in the array.
+
+Consider the following document:
+
+```json
+{
+    "name": "Daenerys Targaryen",
+    "title": [
+        "Queen",
+        "Stormborn",
+        "of the House Targaryen", 
+        "the First of Her Name", 
+        "Queen of the Andals, the Rhoynar and the First Men", 
+        "Lady of the Seven Kingdoms",
+        "Protector of the Realm"
+    ]
+}
+```
+
+Unwinding it on the `title` attribute with:
+
+```javascript
+db.nightwatch.aggregate([
+   {$unwind: "$title"}
+])
+```
+
+Would result in:
+
+```json
+{
+    "name": "Daenerys Targaryen",
+    "title": "Queen"
+}
+{
+    "name": "Daenerys Targaryen",
+    "title": "Stormborn"
+}
+{...}
+{
+    "name": "Daenerys Targaryen",
+    "title": "Protector of the Realm"
+}
+```
+
+##### Sort
+The `$sort` operator allows to sort a collection of documents according to their fields. 
+
+For instance, if we wanted to sort the titles used in the example above in ascending order:
+
+```javascript
+db.nightwatch.aggregate([
+   {$unwind: "$title"},
+   {$sort: {title: 1}}
+])
+```
+
+More than one field can be specified, and `-1` can be used to sort in descending order.
+
+#### Map Reduce  
+
+`TODO :)`
+
+#### Single purpose aggregation methods
+There are a few built-in methods for aggregating with common functions. This allow to quickly create aggregations without writing too much code.
+
+Examples are:
+
+- `db.<collection>.count(<query>, <options>)` – returns the number of documents matching the query in the collection.
+- `db.<collection>.estimatedDocumentCount(<options>)` – returns the number of documents in the collection.
+- `db.<collection>.distinct(<field>, <query>, <options>)` – returns the distinct values of a specific field given a query in the the collection.
+
+For the Night Watch example used earlier, if you wanted to only select the names of the unique houses you would:
+
+```javascript
+db.nightwatch.distinct("house")
+```
+
+Resulting in:
+
+```json
+[
+    "Stark",
+	"Mormont",
+	"Tarly
+]
+```
+
 ### Consistency
-### Map Reduce
 ### Indexes
 ### Data Models
 ### Cursor and Projections
