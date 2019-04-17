@@ -138,7 +138,7 @@ There are three methods to update records: `updateOne`, `updateMany`, and `repla
 
 To update all the records with `fromHouse` set to `Lannister`, so that they their `status` attribute is sent to `paid`:
 
-```json
+```javascript
 db.debts.updateMany(
 	{fromHouse: "Lannister"},
     {$set: {status: "paid"}}
@@ -151,7 +151,7 @@ Two methods allow the removal of documents: `deleteMany` and `deleteOne`.
 
 To remove all documents with the `status` set to `paid` from the `debt` collection:
 
-```json
+```javascript
 db.debt.deleteMany(
 	{status: "paid"}
 )
