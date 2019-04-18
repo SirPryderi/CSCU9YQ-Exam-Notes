@@ -499,7 +499,15 @@ Indexes can have the following properties:
 - **non-sparse** – index all documents, using `null` for those that don't have the index field.
 
 ### Data Models
+Documents in MongoDB are not required to follow the same _schema_. Documents, in fact, can have different fields and different types.
 
+However it is often the case that documents in the same collection share some part of the structure. It is possible to enforce document validation rules for a collection during updates and insert operations.
+
+When dealing with data in MongoDB there are two main approaches one could follow: **embedding** or **references**.
+
+When **embedding data**, relationship are saved as the structure of one document, since  other documents and arrays can be stored within a document. This is known as a **denormalised** data model. They are ideal for one-to-one and one-to-many _contains_ relationships.
+
+When **referencing data**, relationships are represented as references to other documents. This requires further operations to access related data. This is known as a **normalised** data model. They are ideal for more complex hierarchical or many-to-many relationships, to avoid useless duplication.
 
 ### Cursor and Projections
 
