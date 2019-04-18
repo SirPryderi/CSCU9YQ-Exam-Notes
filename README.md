@@ -386,9 +386,29 @@ db.nightwatch.aggregate([
 
 More than one field can be specified, and `-1` can be used to sort in descending order.
 
-#### Map Reduce  
+#### Map Reduce
+The `mapReduce` operation allows to aggregate data using JavaScript functions, allowing a greater deal of flexibility, compared to the `aggregate` operation, at the cost of slower performances and a less consistent syntax.
 
-`TODO :)`
+The method operates with three parameters `map`, `reduce` and `options` (optional).
+
+The following is a rather useless example:
+
+```javascript
+db.<collection>.mapReduce(
+	 // map
+    function() {
+        emit(this.field_to_aggregate_on, this.values);
+    },
+    // reduce
+    function(key, values) {
+        return Array.sum(values); // aggregate the values
+    },
+    // options
+    { 
+        query: {ciao: "ciao"} // this just filters the collection before mapping
+    }
+)
+```
 
 #### Single purpose aggregation methods
 There are a few built-in methods for aggregating with common functions. This allow to quickly create aggregations without writing too much code.
@@ -429,13 +449,18 @@ In MongoDB it is possible, at query time, to choose the level of needed consiste
 
 A distributed database can have only have two of the following:
 
-- **Strong consistency** – all nodes see the same data at the same time
-- **Availability** – every client gets a response, regardless if one of the nodes is down
+- **Strong consistency** – all nodes see the same data at the same time.
+- **Availability** – every client gets a response, regardless if one of the nodes is down.
 - **Partition tolerance** – the system continues to run regardless of the of number of delayed messages.
 
 ### Indexes
+
+
 ### Data Models
+
+
 ### Cursor and Projections
+
 
 ## Other NoSQL databases
 ### Column Family
