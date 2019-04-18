@@ -454,7 +454,49 @@ A distributed database can have only have two of the following:
 - **Partition tolerance** – the system continues to run regardless of the of number of delayed messages.
 
 ### Indexes
+Indexes are used in databases to improve the efficiency of read operations
 
+In MongoDB indexes are defined at the _collection_ level, and is supported on any field or subfield of the documents. 
+
+B-Trees (which are **not** binary trees) are used to create indexes. Differently from binary trees, they can have more than two children at each node, and they perform all operations in `O(log n)` time.
+
+![b-tree](https://nptel.ac.in/courses/Webcourse-contents/IIT-%20Guwahati/data_str_algo/b%20tree/btreeh.gif)
+
+
+Indexes can be of three types:
+
+- **default \_id** – the automatically created \_id field is by default indexed.
+- **single field** – a user defined index on a single field or subfield.
+- **compound index** – sorts according to multiple fields, in the specified order.
+- **multikey index** – sorts according arrays content.
+- **geospatial index** – efficiently sorts geospatial data (coordinates).
+- **text index** – sorts long strings of text ignoring stop words.
+- **hashed index** – indexes the hash of a field.
+
+It is possible to create an index on a field with:
+
+```javascript
+db.<collection>.createIndex({<field>: <1 or -1>})
+```
+
+`1` or `-1` can be used to specify whether the index is going to be ascending or descending.
+
+To add a compound index, simply add more fields to the object:
+
+```javascript
+db.<collection>.createIndex({
+    <field1>: <1 or -1>,
+    <field2>: <1 or -1>,
+    ...
+    <fieldN>: <1 or -1>
+})
+```
+
+Indexes can have the following properties:
+
+- **unique** – reject duplicate data for the same indexed field value.
+- **sparse** – only index entries that have the index field(s).
+- **non-sparse** – index all documents, using `null` for those that don't have the index field.
 
 ### Data Models
 
