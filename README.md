@@ -153,7 +153,7 @@ To remove all documents with the `status` set to `paid` from the `debt` collecti
 
 ```javascript
 db.debt.deleteMany(
-	{status: "paid"}
+    {status: "paid"}
 )
 ```
 
