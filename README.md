@@ -157,6 +157,78 @@ db.debt.deleteMany(
 )
 ```
 
+#### Cursors
+Calling the `db.<collection>.find()` method returns a _cursor_. The cursor allows to iterate through the results.
+
+It is possible to assign the cursor to a variable by using `var`:
+
+```javascript
+var cursor = db.<collection>.find();
+```
+
+Iterating the results can be achieved with:
+
+```javascript
+var cursor = db.<collection>.find();
+cursor.forEach(printjson)
+```
+
+Which could be simplified in:
+
+```javascript
+db.<collection>.find().forEach(printjson)
+```
+
+#### Projections
+Queries performed with `db.<collection>.find()` can be projected in order to change the structure of the returned model. This can be achieved by the use of a secondary parameter.
+
+Considering the following dataset:
+
+```json
+{
+    "_id": "000000abcdef",
+    "name": "Stark",
+    "seat": "Winterfell",
+    "dominion": "The North",
+    "status": "Kings of the North"
+    "keyPeople": {
+    	"ruler": "Eddard Stark",
+		"maester": "Maester Luwin"
+	}
+}
+```
+
+It is possible to create an **inclusion statement** to show only the fields you want. Assuming you are only interested in the `dominion` and `name` field:
+
+```javascript
+db.houses.find(
+    {}, 
+    {dominion: 1, name: 1, _id: 0}
+)
+```
+
+Note how `_id` is always show, and needs to be excluded explicitly.
+
+Conversely, if we were not interested in the `status` field, but wanting to show all the other field (apart from `_id`) we could:
+
+```javascript
+db.houses.find(
+    {}, 
+    {status: 0, _id: 0}
+)
+```
+
+This is known as an **exclusion statement**. Note that, with exception of the `_id` field, exclusion and inclusion cannot be mixed. In other words they can either be all ones or zeros.
+
+It is possible to get subfield using the dot notation. If we just wanted to know the ruler name:
+
+```javascript
+db.houses.find(
+    {}, 
+    {"keyPeople.ruler": 1, _id: 0}
+)
+```
+
 ### Distribution Model
 MongoDB uses both **replication** and **sharding** to improve performances and data reliability.
 
@@ -188,8 +260,8 @@ Data aggregation can be achieved in three ways in MongoDB:
     - Slower
 - Single purpose aggregation methods
     - Limited
- 
- #### Aggregation Pipeline
+
+#### Aggregation Pipeline
  The **aggregation** pipeline is a multi-stage process that transforms the document into an aggregated result. It provides filters, transformations, grouping and arrays manipulation.
  
  The syntax for the aggregation pipeline is the following:
@@ -509,9 +581,20 @@ When **embedding data**, relationship are saved as the structure of one document
 
 When **referencing data**, relationships are represented as references to other documents. This requires further operations to access related data. This is known as a **normalised** data model. They are ideal for more complex hierarchical or many-to-many relationships, to avoid useless duplication.
 
-### Cursor and Projections
-
-
 ## Other NoSQL databases
 ### Column Family
+A **wide column store**, also known as **column-oriented** or **tabular**, is a type of NoSQL database. It uses tables, rows, and columns, but unlike a relational database, the names and format of the columns can vary from row to row in the same table. A wide column store can be interpreted as a two-dimensional key-value store.
+
+#### Google BigTable
+**Bigtable** is one of the examples of a _wide-column_ store that has been developed by Google. It maps two arbitrary string values (row key and column key) and timestamp into an associated arbitrary byte array. It is not a relational database and can be better defined as a sparse, distributed multi-dimensional sorted map. Bigtable is designed to scale into the petabyte range across hundreds or thousands of machines, and to make it easy to add more machines to the system and automatically start taking advantage of those resources without any reconfiguration.
+
+#### Cassandra
+**Cassandra** is another example of _wide-column_ store that has been developed by Facebook and then released as open source. It is designed to be **highly consistent**, **fault-tolerant**, and **scalable**.
+
+Queries in Cassandra are done using **CQL** a query language strongly inspired from **SQL**.
+
+The **distributed** architecture of Cassandra allows to scale continuously without no downtime. It has a **decentralised** peer-to-peer ring of nodes, then does not posses a single point of failure. It is designed to scale linearly, e.g. doubling the number of nodes doubles the performance.
+
+The dataset is evenly distributed among the nodes using a hashing function. To prevent loss, the data is also replicated across the nodes.
+
 ### Graph Databases
