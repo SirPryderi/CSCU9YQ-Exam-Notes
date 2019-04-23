@@ -598,3 +598,8 @@ The **distributed** architecture of Cassandra allows to scale continuously witho
 The dataset is evenly distributed among the nodes using a hashing function. To prevent loss, the data is also replicated across the nodes.
 
 ### Graph Databases
+A **graph database** is a storage that uses principles like _nodes_ and _edges_ to describe relationships between data. The main difference from a traditional relational database, is that that not only records (_nodes_) can have values, but also the relationships between them (the _edges_) can have a value attached to them. They are used to store data with very complex relationships. The focus on this kind of databases is on the relationship between records, so they are natively more efficient in resolving relationships compared to other data models.
+
+Example graph databases are: **DataStax Graph**, **Neo4j**, **OrientDB**, **InfiniteGraph**, **AllegroGraph**.
+
+There's not officially recognised query language for graph databases, but multi-vendor languages exist, such as **Gremlin** and **SPARQL** which allow to make complex-relationship queries in a much more elegant manner than SQL.
